@@ -1,2 +1,137 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg-black: #000000;
+  --panel: #07070a;
+  --panel-soft: #0b0b12;
+  --text-main: #f5f7ff;
+  --text-muted: #a7b0c8;
+  --neon-pink: #ff2ad4;
+  --neon-blue: #22d3ee;
+  --neon-green: #39ff88;
+  --neon-border: rgba(34, 211, 238, 0.65);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg-black);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-main);
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background-image:
+    radial-gradient(900px circle at 12% 12%, rgba(34, 211, 238, 0.12), transparent 36%),
+    radial-gradient(900px circle at 88% 18%, rgba(255, 42, 212, 0.14), transparent 38%),
+    radial-gradient(1000px circle at 50% 90%, rgba(57, 255, 136, 0.08), transparent 42%);
+}
+
+main {
+  background: transparent;
+}
+
+/* Surfaces and text tone remap */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-red-50,
+.bg-green-50,
+.bg-yellow-50,
+.bg-indigo-50,
+.bg-amber-50 {
+  background-color: var(--panel) !important;
+}
+
+.text-gray-900,
+.text-gray-800,
+.text-gray-700 {
+  color: var(--text-main) !important;
+}
+
+.text-gray-600,
+.text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+.border-gray-300,
+.border-gray-200,
+.border-gray-100,
+.ring-gray-300,
+.ring-gray-200,
+.ring-gray-100 {
+  border-color: var(--neon-border) !important;
+  --tw-ring-color: var(--neon-border) !important;
+}
+
+.ring-indigo-200,
+.ring-green-200,
+.ring-yellow-200,
+.ring-amber-200 {
+  --tw-ring-color: var(--neon-border) !important;
+}
+
+section,
+article,
+.rounded-lg,
+.rounded-xl {
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.25),
+    0 0 24px rgba(34, 211, 238, 0.13),
+    0 0 34px rgba(255, 42, 212, 0.1);
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+  background-color: #030307 !important;
+  color: var(--text-main) !important;
+  border-color: var(--neon-border) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7f8aa7 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--neon-blue) !important;
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.75),
+    0 0 18px rgba(34, 211, 238, 0.28);
+}
+
+/* Primary buttons */
+button,
+input[type="button"],
+input[type="submit"] {
+  color: #ffffff;
+  border: 1px solid rgba(255, 42, 212, 0.5);
+  background-image: linear-gradient(135deg, var(--neon-pink), #a855f7 45%, var(--neon-blue));
+  box-shadow:
+    0 0 16px rgba(255, 42, 212, 0.35),
+    0 0 24px rgba(34, 211, 238, 0.28);
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover {
+  filter: brightness(1.08);
+  box-shadow:
+    0 0 22px rgba(255, 42, 212, 0.45),
+    0 0 30px rgba(34, 211, 238, 0.35);
+}
+
+a {
+  color: #b9c7ff;
+}
 

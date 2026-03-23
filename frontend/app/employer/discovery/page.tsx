@@ -367,11 +367,12 @@ function Sparkline({ values }: { values: number[] }) {
     <svg width="100%" viewBox={`0 0 ${width} ${height}`} className="h-12 w-full">
       <polyline
         fill="none"
-        stroke="#4f46e5"
+        stroke="#39ff88"
         strokeWidth="2"
         strokeLinejoin="round"
         strokeLinecap="round"
         points={points}
+        style={{ filter: "drop-shadow(0 0 4px rgba(57,255,136,0.9)) drop-shadow(0 0 10px rgba(57,255,136,0.45))" }}
       />
     </svg>
   )
