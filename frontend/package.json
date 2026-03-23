@@ -14,14 +14,14 @@
     "react-dom": "*"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "*",
+    "@types/react": "*",
+    "@types/react-dom": "*",
     "autoprefixer": "*",
     "eslint-config-next": "*",
     "postcss": "*",
     "tailwindcss": "*",
-    "typescript": "*",
-    "@types/node": "*",
-    "@types/react": "*",
-    "@types/react-dom": "*"
+    "typescript": "*"
   }
 }
-
