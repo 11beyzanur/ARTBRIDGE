@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -32,8 +32,8 @@ class EmployerCandidateItem(BaseModel):
     is_career_ready: bool
 
     top_public_summaries: list[str] = Field(default_factory=list)
-    trend_points_12m: list[float | None] = Field(default_factory=list)
-    avg_feedback_application_weeks: float | None = None
+    trend_points_12m: list[Optional[float]] = Field(default_factory=list)
+    avg_feedback_application_weeks: Optional[float] = None
 
 
 class EmployerDiscoverySearchResponse(BaseModel):
@@ -45,5 +45,5 @@ class EmployerDiscoverySearchResponse(BaseModel):
 
     items: list[EmployerCandidateItem]
 
-    total_candidates_matched: int | None = None
+    total_candidates_matched: Optional[int] = None
 

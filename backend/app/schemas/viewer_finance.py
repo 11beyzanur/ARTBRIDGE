@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -9,8 +10,8 @@ class ViewerEarningItem(BaseModel):
     amount_try: float
     status: str
     created_at: dt.datetime
-    paid_at: dt.datetime | None = None
-    donated_at: dt.datetime | None = None
+    paid_at: Optional[dt.datetime] = None
+    donated_at: Optional[dt.datetime] = None
 
 
 class ViewerEarningsSummaryResponse(BaseModel):
@@ -24,7 +25,7 @@ class ViewerEarningsSummaryResponse(BaseModel):
 
 class ViewerPayoutRequestCreate(BaseModel):
     iban: str = Field(min_length=8, max_length=64)
-    note: str | None = Field(default=None, max_length=500)
+    note: Optional[str] = Field(default=None, max_length=500)
 
 
 class ViewerPayoutRequestItem(BaseModel):
@@ -32,9 +33,9 @@ class ViewerPayoutRequestItem(BaseModel):
     amount_try: float
     status: str
     iban: str
-    note: str | None = None
+    note: Optional[str] = None
     created_at: dt.datetime
-    processed_at: dt.datetime | None = None
+    processed_at: Optional[dt.datetime] = None
 
 
 class ViewerPayoutRequestCreateResponse(BaseModel):

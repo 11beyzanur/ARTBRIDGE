@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -26,7 +26,7 @@ class CareerReadyMineResponse(BaseModel):
 
     target_label: Literal["Kariyere Hazırlık Analizi"] = "Kariyere Hazırlık Analizi"
 
-    avg_score: float | None = None
+    avg_score: Optional[float] = None
     items: list[CareerReadyAnalysisItem]
 
 
@@ -37,7 +37,7 @@ class CareerReadyShareResponse(BaseModel):
     progress_percent: int
     target_label: Literal["Kariyere Hazırlık Analizi"] = "Kariyere Hazırlık Analizi"
 
-    avg_score: float | None = None
+    avg_score: Optional[float] = None
     items: list[CareerReadyAnalysisItem]
 
 

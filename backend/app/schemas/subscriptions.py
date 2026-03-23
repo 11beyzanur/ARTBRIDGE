@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -6,7 +8,7 @@ class BillingAddress(BaseModel):
     contactName: str = Field(min_length=2, max_length=128)
     city: str = Field(min_length=1, max_length=64)
     country: str = Field(min_length=2, max_length=64)
-    zipCode: str | None = Field(default=None, max_length=32)
+    zipCode: Optional[str] = Field(default=None, max_length=32)
 
 
 class IyzicoCustomer(BaseModel):
@@ -30,8 +32,8 @@ class SubscribeInitializeResponse(BaseModel):
 
 class SubscriptionMeResponse(BaseModel):
     status: str
-    subscription_reference_code: str | None = None
-    order_reference_code: str | None = None
+    subscription_reference_code: Optional[str] = None
+    order_reference_code: Optional[str] = None
 
 
 class SubscriptionInitializeCustomerData(BaseModel):

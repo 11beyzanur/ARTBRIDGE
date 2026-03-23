@@ -1,15 +1,16 @@
 import datetime as dt
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class PortfolioAIMetadataUpsertRequest(BaseModel):
     tags: list[str] = Field(default_factory=list, max_length=100)
-    auto_caption: str | None = Field(default=None, max_length=2000)
-    quality_score: float | None = Field(default=None, ge=0, le=1)
-    nsfw_score: float | None = Field(default=None, ge=0, le=1)
-    moderation_status: str | None = None
-    embedding_status: str | None = None
+    auto_caption: Optional[str] = Field(default=None, max_length=2000)
+    quality_score: Optional[float] = Field(default=None, ge=0, le=1)
+    nsfw_score: Optional[float] = Field(default=None, ge=0, le=1)
+    moderation_status: Optional[str] = None
+    embedding_status: Optional[str] = None
 
 
 class PortfolioAIMetadataResponse(BaseModel):
@@ -17,9 +18,9 @@ class PortfolioAIMetadataResponse(BaseModel):
     discipline: str
     technique: str
     tags: list[str]
-    auto_caption: str | None = None
-    quality_score: float | None = None
-    nsfw_score: float | None = None
+    auto_caption: Optional[str] = None
+    quality_score: Optional[float] = None
+    nsfw_score: Optional[float] = None
     moderation_status: str
     embedding_status: str
     updated_at: dt.datetime
@@ -27,7 +28,7 @@ class PortfolioAIMetadataResponse(BaseModel):
 
 class AIPipelineJobCreateRequest(BaseModel):
     job_type: str
-    payload_json: str | None = Field(default=None, max_length=10000)
+    payload_json: Optional[str] = Field(default=None, max_length=10000)
 
 
 class AIPipelineJobCreateResponse(BaseModel):
@@ -43,7 +44,7 @@ class AIPipelineJobItem(BaseModel):
     status: str
     attempt_count: int
     scheduled_at: dt.datetime
-    processed_at: dt.datetime | None = None
+    processed_at: Optional[dt.datetime] = None
 
 
 class AIPipelineJobListResponse(BaseModel):

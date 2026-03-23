@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 
@@ -23,6 +23,6 @@ class EmployerPackageInitializeResponse(BaseModel):
 
 class EmployerPackageMeResponse(BaseModel):
     status: str
-    plan_type: str | None = None
+    plan_type: Optional[str] = None
     can_access_learning_agility: bool = False
 

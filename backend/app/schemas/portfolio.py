@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -7,7 +9,7 @@ class PresignPortfolioUploadRequest(BaseModel):
     school: str = Field(min_length=1, max_length=128)
     file_name: str = Field(min_length=1, max_length=255)
     content_type: str = Field(min_length=3, max_length=128)
-    file_size: int | None = Field(default=None, ge=1)
+    file_size: Optional[int] = Field(default=None, ge=1)
 
 
 class PresignPortfolioUploadResponse(BaseModel):

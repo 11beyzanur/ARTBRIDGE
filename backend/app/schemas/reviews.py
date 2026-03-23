@@ -1,4 +1,5 @@
 import datetime as dt
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -41,7 +42,7 @@ class StudentReviewSessionItem(BaseModel):
     technique: str
     status: str
     created_at: dt.datetime
-    completed_at: dt.datetime | None = None
+    completed_at: Optional[dt.datetime] = None
 
 
 class StudentReviewsResponse(BaseModel):

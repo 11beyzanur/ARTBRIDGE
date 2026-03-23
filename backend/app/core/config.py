@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -52,11 +52,11 @@ class Settings(BaseSettings):
         default="artbridge",
         validation_alias="AWS_S3_PREFIX",
     )
-    aws_access_key_id: str | None = Field(
+    aws_access_key_id: Optional[str] = Field(
         default=None,
         validation_alias="AWS_ACCESS_KEY_ID",
     )
-    aws_secret_access_key: str | None = Field(
+    aws_secret_access_key: Optional[str] = Field(
         default=None,
         validation_alias="AWS_SECRET_ACCESS_KEY",
     )
