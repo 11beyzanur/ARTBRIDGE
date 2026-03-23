@@ -1,7 +1,7 @@
 "use client"
 
 import type { StudentReviewSessionItem, StudentReviewsResponse } from "@shared/contracts/reviews"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
 function statusLabel(status: string) {
@@ -18,7 +18,7 @@ function statusBadgeClass(status: string) {
   return "bg-gray-50 text-gray-800 ring-gray-200"
 }
 
-export default function StudentReviewsPage() {
+function StudentReviewsContent() {
   const searchParams = useSearchParams()
   const highlightedPortfolioId = searchParams.get("portfolio_id")
 
@@ -207,6 +207,22 @@ export default function StudentReviewsPage() {
         )
       })}
     </main>
+  )
+}
+
+export default function StudentReviewsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-10">
+          <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-200">
+            <p className="text-sm text-gray-600">Durumlar yükleniyor...</p>
+          </div>
+        </main>
+      }
+    >
+      <StudentReviewsContent />
+    </Suspense>
   )
 }
 

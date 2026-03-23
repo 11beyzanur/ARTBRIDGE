@@ -1,7 +1,7 @@
 "use client"
 
 import type { CareerReadyShareResponse } from "@shared/contracts/career_ready"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
 function formatDate(dateString: string) {
@@ -9,7 +9,7 @@ function formatDate(dateString: string) {
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString()
 }
 
-export default function CareerReadySharePage() {
+function CareerReadyShareContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token") ?? ""
 
@@ -127,6 +127,22 @@ export default function CareerReadySharePage() {
         </>
       ) : null}
     </main>
+  )
+}
+
+export default function CareerReadySharePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-10">
+          <div className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+            <p className="text-sm text-gray-600">Analiz yükleniyor...</p>
+          </div>
+        </main>
+      }
+    >
+      <CareerReadyShareContent />
+    </Suspense>
   )
 }
 

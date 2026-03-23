@@ -1,5 +1,5 @@
 import type { AuthUser, UserRole } from "@shared/contracts/auth"
-import { cookies } from "next/headers"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 const roleLabels: Record<UserRole, string> = {
@@ -9,8 +9,13 @@ const roleLabels: Record<UserRole, string> = {
 }
 
 export default async function DashboardPage() {
-  const tokenCookie = cookies().get("artbridge_access_token")
-  const token = tokenCookie?.value
+  const headerStore = await headers()
+  const cookieHeader = headerStore.get("cookie") ?? ""
+  const token = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith("artbridge_access_token="))
+    ?.split("=")[1]
 
   const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:8000"
   if (!token) {

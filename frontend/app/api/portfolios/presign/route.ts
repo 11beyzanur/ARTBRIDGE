@@ -11,7 +11,8 @@ type PresignPayload = {
 }
 
 export async function POST(req: NextRequest) {
-  const token = cookies().get("artbridge_access_token")?.value
+  const cookieStore = await cookies()
+  const token = cookieStore.get("artbridge_access_token")?.value
   if (!token) {
     return NextResponse.json({ detail: "Not authenticated" }, { status: 401 })
   }
