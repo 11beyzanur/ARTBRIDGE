@@ -5,7 +5,7 @@ import hashlib
 import hmac
 import json
 import secrets
-from typing import Any
+from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
 import httpx
@@ -13,7 +13,7 @@ import httpx
 from app.core.config import settings
 
 
-def _json_dumps(payload: dict[str, Any] | list[Any] | None) -> str:
+def _json_dumps(payload: Optional[Union[dict[str, Any], list[Any]]]) -> str:
     if payload is None:
         return ""
     return json.dumps(payload, separators=(",", ":"), ensure_ascii=False)
@@ -40,7 +40,7 @@ async def _request_json(
     *,
     method: str,
     path: str,
-    json_body: dict[str, Any] | None = None,
+    json_body: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     base_url = settings.iyzico_base_url.rstrip("/")
     url = f"{base_url}{path}"

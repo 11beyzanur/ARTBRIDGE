@@ -1,6 +1,7 @@
 import datetime as dt
 import enum
 import uuid
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -39,10 +40,10 @@ class EmployerPackageSubscription(Base):
     plan_type: Mapped[str] = mapped_column(String(24), index=True)
     pricing_plan_reference_code: Mapped[str] = mapped_column(String(128), index=True)
 
-    checkout_token: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-    subscription_reference_code: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
-    order_reference_code: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    customer_reference_code: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    checkout_token: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    subscription_reference_code: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    order_reference_code: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    customer_reference_code: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     status: Mapped[str] = mapped_column(
         String(32),

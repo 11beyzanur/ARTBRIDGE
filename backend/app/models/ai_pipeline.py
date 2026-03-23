@@ -1,6 +1,7 @@
 import datetime as dt
 import enum
 import uuid
+from typing import Optional
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -58,10 +59,10 @@ class PortfolioAIMetadata(Base):
     technique: Mapped[str] = mapped_column(String(64), index=True)
 
     tags_csv: Mapped[str] = mapped_column(Text, default="")
-    auto_caption: Mapped[str | None] = mapped_column(Text, nullable=True)
+    auto_caption: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    quality_score: Mapped[float | None] = mapped_column(Float, nullable=True)
-    nsfw_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    quality_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    nsfw_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     moderation_status: Mapped[str] = mapped_column(String(24), default=ModerationStatus.pending.value, index=True)
     embedding_status: Mapped[str] = mapped_column(String(24), default=EmbeddingStatus.pending.value, index=True)
 
@@ -97,13 +98,13 @@ class AIPipelineJob(Base):
     job_type: Mapped[str] = mapped_column(String(32), index=True)
     status: Mapped[str] = mapped_column(String(24), default=JobStatus.queued.value, index=True)
 
-    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
-    result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payload_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    result_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     attempt_count: Mapped[int] = mapped_column(Integer, default=0)
 
     scheduled_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: dt.datetime.now(dt.timezone.utc),
     )
-    processed_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    processed_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 

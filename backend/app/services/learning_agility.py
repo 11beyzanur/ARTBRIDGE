@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import defaultdict
+from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,7 +33,7 @@ async def get_learning_agility_mine(
     session: AsyncSession,
     student_id: str,
     target_days: float = TARGET_DAYS_DEFAULT,
-    window_days: float | None = None,
+    window_days: Optional[float] = None,
 ) -> dict:
     # Fetch sessions for all disciplines ordered by discipline then request time
     sessions_result = await session.execute(
@@ -62,7 +63,7 @@ async def get_learning_agility_mine(
     overall_days_sum = 0.0
     overall_score_sum = 0.0
 
-    cutoff: dt.datetime | None = None
+    cutoff: Optional[dt.datetime] = None
     if window_days is not None:
         cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=window_days)
 

@@ -1,5 +1,5 @@
 from collections.abc import Awaitable, Callable
-from typing import TypeVar
+from typing import Optional, TypeVar
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -24,7 +24,7 @@ T = TypeVar("T")
 
 
 async def get_current_user(
-    token: str | None = Depends(oauth2_scheme),
+    token: Optional[str] = Depends(oauth2_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> User:
     if not token:

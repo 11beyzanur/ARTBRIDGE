@@ -1,6 +1,7 @@
 import datetime as dt
 import enum
 import uuid
+from typing import Optional
 
 from sqlalchemy import DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -47,8 +48,8 @@ class ViewerEarning(Base):
         DateTime(timezone=True),
         default=lambda: dt.datetime.now(dt.timezone.utc),
     )
-    paid_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    donated_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    paid_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    donated_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class ViewerPayoutRequest(Base):
@@ -68,11 +69,11 @@ class ViewerPayoutRequest(Base):
     status: Mapped[str] = mapped_column(String(24), default=ViewerPayoutStatus.requested.value, index=True)
 
     iban: Mapped[str] = mapped_column(String(64))
-    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: dt.datetime.now(dt.timezone.utc),
     )
-    processed_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    processed_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 

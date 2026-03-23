@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import defaultdict
+from typing import Optional
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -134,7 +135,7 @@ async def search_employer_candidates(
             }
         )
 
-    def compute_avg_feedback_weeks(student_id: str) -> float | None:
+    def compute_avg_feedback_weeks(student_id: str) -> Optional[float]:
         timeline = timeline_by_student.get(student_id, [])
         if not timeline:
             return None
@@ -165,7 +166,7 @@ async def search_employer_candidates(
             return None
         return round(sum(diffs_weeks) / len(diffs_weeks), 2)
 
-    def build_trend_points_12m(student_sessions: list[dict]) -> list[float | None]:
+    def build_trend_points_12m(student_sessions: list[dict]) -> list[Optional[float]]:
         now = dt.datetime.now(dt.timezone.utc)
         months: list[tuple[int, int]] = []
         for i in range(11, -1, -1):
@@ -190,7 +191,7 @@ async def search_employer_candidates(
             score = (s["conceptual"] + s["technical"] + s["originality"]) / 3.0
             bucket_scores[key].append(score)
 
-        points: list[float | None] = []
+        points: list[Optional[float]] = []
         for key in months:
             scores = bucket_scores.get(key, [])
             if not scores:

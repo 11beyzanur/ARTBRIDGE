@@ -1,6 +1,7 @@
 import datetime as dt
 import enum
 import uuid
+from typing import Optional
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -36,7 +37,7 @@ class Portfolio(Base):
 
     asset_key: Mapped[str] = mapped_column(String(512), unique=True, index=True)
     content_type: Mapped[str] = mapped_column(String(128))
-    file_size: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    file_size: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
 
     status: Mapped[str] = mapped_column(String(32), index=True, default=PortfolioStatus.pending_upload.value)
 
@@ -44,5 +45,5 @@ class Portfolio(Base):
         DateTime(timezone=True),
         default=lambda: dt.datetime.now(dt.timezone.utc),
     )
-    uploaded_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    uploaded_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 

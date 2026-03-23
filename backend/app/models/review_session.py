@@ -1,6 +1,7 @@
 import datetime as dt
 import enum
 import uuid
+from typing import Optional
 
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -33,7 +34,7 @@ class ReviewSession(Base):
         ForeignKey("portfolios.id", ondelete="CASCADE"),
         index=True,
     )
-    viewer_id: Mapped[str | None] = mapped_column(
+    viewer_id: Mapped[Optional[str]] = mapped_column(
         String(36),
         ForeignKey("users.id", ondelete="SET NULL"),
         index=True,
@@ -51,6 +52,6 @@ class ReviewSession(Base):
         DateTime(timezone=True),
         default=lambda: dt.datetime.now(dt.timezone.utc),
     )
-    assigned_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    completed_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    assigned_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[dt.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
