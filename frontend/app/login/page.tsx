@@ -3,10 +3,8 @@
 import type { AuthUser } from "@shared/contracts/auth"
 import type { FormEvent } from "react"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -33,13 +31,15 @@ export default function LoginPage() {
 
       const data = (await res.json().catch(() => null)) as { user?: AuthUser } | null
       const role = data?.user?.role
-      if (role === "student") {
-        router.push("/student/dashboard")
-      } else if (role === "viewer") {
-        router.push("/viewer/review")
-      } else {
-        router.push("/dashboard")
-      }
+      const target =
+        role === "student"
+          ? "/student/dashboard"
+          : role === "viewer"
+            ? "/viewer/review"
+            : "/dashboard"
+
+      // Use hard navigation so Set-Cookie is fully committed before role pages run auth checks.
+      window.location.replace(target)
     } catch (err) {
       setError("Sunucuya bağlanılamadı")
     } finally {

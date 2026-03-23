@@ -1,7 +1,8 @@
 "use client"
 
 import type { ChangeEvent, FormEvent } from "react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 
 const disciplineSuggestions = [
   "Resim",
@@ -22,8 +23,10 @@ type ReviewTask = {
 }
 
 export default function ViewerReviewPage() {
+  const router = useRouter()
   const [discipline, setDiscipline] = useState("")
   const [task, setTask] = useState<ReviewTask | null>(null)
+  const [isRoleChecked, setIsRoleChecked] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -139,6 +142,47 @@ export default function ViewerReviewPage() {
 
   const isImage = task?.content_type?.startsWith("image/") ?? false
   const isVideo = task?.content_type?.startsWith("video/") ?? false
+
+  useEffect(() => {
+    let cancelled = false
+    const ensureViewerRole = async () => {
+      try {
+        const res = await fetch("/api/auth/me", { method: "GET", cache: "no-store" })
+        const data = await res.json().catch(() => null)
+        if (!res.ok || !data?.role) {
+          if (!cancelled) router.replace("/login")
+          return
+        }
+        if (data.role !== "viewer") {
+          if (!cancelled) {
+            if (data.role === "student") {
+              router.replace("/student/dashboard")
+            } else {
+              router.replace("/dashboard")
+            }
+          }
+          return
+        }
+        if (!cancelled) setIsRoleChecked(true)
+      } catch {
+        if (!cancelled) router.replace("/login")
+      }
+    }
+    void ensureViewerRole()
+    return () => {
+      cancelled = true
+    }
+  }, [router])
+
+  if (!isRoleChecked) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-10">
+        <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+          <p className="text-sm text-gray-600">Yetki kontrolu yapiliyor...</p>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-10">

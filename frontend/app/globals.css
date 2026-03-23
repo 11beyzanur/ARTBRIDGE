@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
 :root {
   --bg-black: #000000;
@@ -91,13 +91,25 @@ input,
 textarea,
 select {
   background-color: #030307 !important;
-  color: var(--text-main) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
   border-color: var(--neon-border) !important;
+  caret-color: #ffffff;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #7f8aa7 !important;
+  color: #9aa6c9 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #030307 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 input:focus,
@@ -133,5 +145,28 @@ input[type="submit"]:hover {
 
 a {
   color: #b9c7ff;
+}
+
+/* Keep semantic status colors readable on dark backgrounds */
+.text-green-700,
+.text-green-800 {
+  color: #6dffad !important;
+}
+
+.text-red-700,
+.text-red-800 {
+  color: #ff8cae !important;
+}
+
+.text-yellow-700,
+.text-yellow-800,
+.text-amber-700,
+.text-amber-800 {
+  color: #ffd36a !important;
+}
+
+.text-indigo-700,
+.text-indigo-800 {
+  color: #8ab4ff !important;
 }
 
