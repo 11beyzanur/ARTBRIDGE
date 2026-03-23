@@ -33,6 +33,9 @@ export default async function DashboardPage() {
   }
 
   const user = (await res.json()) as AuthUser
+  if (user.role === "student") {
+    redirect("/student/dashboard")
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-10">
