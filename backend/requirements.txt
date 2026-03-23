@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+aiosqlite
+pydantic-settings>=2.0
+PyJWT>=2.8
+passlib[bcrypt]>=1.7
+boto3
+httpx>=0.27
+python-multipart>=0.0.9
