@@ -1,0 +1,23 @@
+.DS_Store
+.cursor/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+backend/.venv/
+
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+out/
+
+# Logs and local env
+*.log
+.env
+.env.local
+.env.*.local
