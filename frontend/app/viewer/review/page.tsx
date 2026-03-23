@@ -3,6 +3,15 @@
 import type { ChangeEvent, FormEvent } from "react"
 import { useMemo, useState } from "react"
 
+const disciplineSuggestions = [
+  "Resim",
+  "Heykel",
+  "İllüstrasyon",
+  "Grafik Tasarım",
+  "Endüstriyel Tasarım",
+  "3D Animasyon"
+]
+
 type ReviewTask = {
   session_id: string
   portfolio_id: string
@@ -67,7 +76,13 @@ export default function ViewerReviewPage() {
       const res = await fetch(`/api/reviews/next?discipline=${encodeURIComponent(disciplineValue)}`)
       if (!res.ok) {
         const data = await res.json().catch(() => null)
-        setError(data?.detail ?? "Görev alınamadı")
+        const detail = String(data?.detail ?? "")
+        if (res.status === 404) {
+          setTask(null)
+          setMessage(detail || "Bu disiplin için şu an sırada iş bulunmuyor")
+          return
+        }
+        setError(detail || "Görev alınamadı")
         return
       }
 
@@ -143,9 +158,15 @@ export default function ViewerReviewPage() {
             value={discipline}
             aria-label="Disiplin"
             onChange={handleDisciplineChange}
+            list="discipline-options"
             className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-0 focus:border-gray-500 focus:ring-0"
             placeholder="Örn: 3D Animasyon, İllüstrasyon"
           />
+          <datalist id="discipline-options">
+            {disciplineSuggestions.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
         </div>
 
         <button

@@ -1,4 +1,5 @@
 import datetime as dt
+import unicodedata
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
@@ -24,6 +25,46 @@ from app.core.config import settings
 
 
 reviews_router = APIRouter(tags=["reviews"])
+
+
+DISCIPLINE_ALIASES = {
+    "resim": "illustration",
+    "illustrasyon": "illustration",
+    "illüstrasyon": "illustration",
+    "ilustrasyon": "illustration",
+    "illustration": "illustration",
+    "grafik tasarim": "graphic_design",
+    "grafik tasarım": "graphic_design",
+    "graphic design": "graphic_design",
+    "heykel": "sculpture",
+    "sculpture": "sculpture",
+    "endustriyel tasarim": "industrial_design",
+    "endüstriyel tasarım": "industrial_design",
+    "industrial design": "industrial_design",
+    "3d animasyon": "3d_animation",
+    "3d animation": "3d_animation",
+    "animasyon": "3d_animation",
+}
+
+
+def _normalize_text(value: str) -> str:
+    lowered = value.strip().lower()
+    tr_fixed = (
+        lowered.replace("ı", "i")
+        .replace("ğ", "g")
+        .replace("ş", "s")
+        .replace("ç", "c")
+        .replace("ö", "o")
+        .replace("ü", "u")
+    )
+    normalized = unicodedata.normalize("NFKD", tr_fixed)
+    ascii_only = normalized.encode("ascii", "ignore").decode("ascii")
+    return " ".join(ascii_only.split())
+
+
+def _canonical_discipline(value: str) -> str:
+    normalized = _normalize_text(value)
+    return DISCIPLINE_ALIASES.get(normalized, normalized)
 
 
 @reviews_router.post(
@@ -84,18 +125,24 @@ async def get_next_review_task(
     session: AsyncSession = Depends(get_session),
     viewer=Depends(require_roles([UserRole.viewer])),
 ) -> ReviewTaskResponse:
+    requested_key = _canonical_discipline(discipline)
     result = await session.execute(
         select(ReviewSession)
         .where(
             ReviewSession.status == ReviewSessionStatus.queued.value,
-            ReviewSession.discipline == discipline,
         )
         .order_by(ReviewSession.created_at.asc())
-        .limit(1)
     )
-    review_session = result.scalar_one_or_none()
+    queued_sessions = result.scalars().all()
+    review_session = next(
+        (rs for rs in queued_sessions if _canonical_discipline(rs.discipline) == requested_key),
+        None,
+    )
     if review_session is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No queued reviews")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bu disiplin icin su anda eslesen sirada is yok",
+        )
 
     portfolio_result = await session.execute(select(Portfolio).where(Portfolio.id == review_session.portfolio_id))
     portfolio = portfolio_result.scalar_one_or_none()
