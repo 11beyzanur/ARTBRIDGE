@@ -1,5 +1,6 @@
 "use client"
 
+import type { AuthUser } from "@shared/contracts/auth"
 import type { FormEvent } from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -30,7 +31,15 @@ export default function LoginPage() {
         return
       }
 
-      router.push("/dashboard")
+      const data = (await res.json().catch(() => null)) as { user?: AuthUser } | null
+      const role = data?.user?.role
+      if (role === "student") {
+        router.push("/student/dashboard")
+      } else if (role === "viewer") {
+        router.push("/viewer/review")
+      } else {
+        router.push("/dashboard")
+      }
     } catch (err) {
       setError("Sunucuya bağlanılamadı")
     } finally {

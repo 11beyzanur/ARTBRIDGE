@@ -36,6 +36,9 @@ export default async function DashboardPage() {
   if (user.role === "student") {
     redirect("/student/dashboard")
   }
+  if (user.role === "viewer") {
+    redirect("/viewer/review")
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-10">
@@ -60,77 +63,19 @@ export default async function DashboardPage() {
       </section>
 
       <div className="flex flex-wrap gap-3">
-        {user.role === "student" ? (
-          <a
-            href="/upload"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Portfolyo Yükle
-          </a>
-        ) : null}
+        <a
+          href="/employer/discovery"
+          className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
+        >
+          Aday Keşfi & Filtreleme
+        </a>
 
-        {user.role === "student" ? (
-          <a
-            href="/student/reviews"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Review Durumlarım
-          </a>
-        ) : null}
-
-        {user.role === "student" ? (
-          <a
-            href="/student/learning-agility"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Öğrenme İvmesi
-          </a>
-        ) : null}
-
-        {user.role === "student" ? (
-          <a
-            href="/student/career-ready"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Kariyere Hazırlık Analizi
-          </a>
-        ) : null}
-
-        {user.role === "viewer" ? (
-          <a
-            href="/viewer/review"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Viewer Değerlendirme
-          </a>
-        ) : null}
-
-        {user.role === "viewer" ? (
-          <a
-            href="/viewer/finance"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Kazanç & Payout
-          </a>
-        ) : null}
-
-        {user.role === "employer" ? (
-          <a
-            href="/employer/discovery"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Aday Keşfi & Filtreleme
-          </a>
-        ) : null}
-
-        {user.role === "employer" ? (
-          <a
-            href="/employer/packages"
-            className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
-          >
-            Paketler (Standard/Enterprise)
-          </a>
-        ) : null}
+        <a
+          href="/employer/packages"
+          className="w-fit rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-300 hover:bg-gray-50"
+        >
+          Paketler (Standard/Enterprise)
+        </a>
 
         <a
           href="/api/auth/logout"
