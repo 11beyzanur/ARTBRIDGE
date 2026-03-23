@@ -141,7 +141,7 @@ async def get_next_review_task(
     if review_session is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Bu disiplin icin su anda eslesen sirada is yok",
+            detail="Bu disiplin için şu anda sırada eşleşen bir iş yok",
         )
 
     portfolio_result = await session.execute(select(Portfolio).where(Portfolio.id == review_session.portfolio_id))
