@@ -4,6 +4,8 @@ import type { ChangeEvent, FormEvent } from "react"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
 export default function UploadPortfolioPage() {
   const router = useRouter()
   const [discipline, setDiscipline] = useState("")
@@ -47,6 +49,14 @@ export default function UploadPortfolioPage() {
     setIsUploading(true)
 
     try {
+      if (RICH_DEMO) {
+        await new Promise((r) => setTimeout(r, 500))
+        const demoPid = `demo-portfolio-${Date.now()}`
+        setUploadedPortfolioId(demoPid)
+        setSuccess("Portfolyo yüklendi (demo — S3 atlandı)")
+        setFile(null)
+        return
+      }
       const presignRes = await fetch("/api/portfolios/presign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,6 +130,13 @@ export default function UploadPortfolioPage() {
     setReviewRequestStatus(null)
 
     try {
+      if (RICH_DEMO) {
+        await new Promise((r) => setTimeout(r, 400))
+        setReviewRequestStatus("queued")
+        setSuccess("Değerlendirmeye gönderildi (demo)")
+        router.push(`/student/reviews?portfolio_id=${encodeURIComponent(portfolioId)}`)
+        return
+      }
       const res = await fetch("/api/reviews/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

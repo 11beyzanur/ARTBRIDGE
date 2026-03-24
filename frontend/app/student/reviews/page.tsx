@@ -4,6 +4,49 @@ import type { StudentReviewSessionItem, StudentReviewsResponse } from "@shared/c
 import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+const demoStudentReviews = (): StudentReviewsResponse => ({
+  items: [
+    {
+      session_id: "demo-sr-1",
+      portfolio_id: "demo-pf-ill-1",
+      discipline: "İllüstrasyon",
+      technique: "Dijital / Procreate",
+      status: "completed",
+      created_at: "2025-02-01T09:00:00.000Z",
+      completed_at: "2025-02-06T17:30:00.000Z"
+    },
+    {
+      session_id: "demo-sr-2",
+      portfolio_id: "demo-pf-gra-1",
+      discipline: "Grafik Tasarım",
+      technique: "Vektör / Print",
+      status: "completed",
+      created_at: "2025-02-20T10:15:00.000Z",
+      completed_at: "2025-02-28T14:00:00.000Z"
+    },
+    {
+      session_id: "demo-sr-3",
+      portfolio_id: "demo-pf-3d-1",
+      discipline: "3D Animasyon",
+      technique: "Blender / Cycles",
+      status: "completed",
+      created_at: "2025-03-05T11:00:00.000Z",
+      completed_at: "2025-03-12T16:20:00.000Z"
+    },
+    {
+      session_id: "demo-sr-4",
+      portfolio_id: "demo-pf-new",
+      discipline: "Heykel / Obje",
+      technique: "Seramik",
+      status: "assigned",
+      created_at: "2025-03-28T08:00:00.000Z",
+      completed_at: null
+    }
+  ]
+})
+
 function statusLabel(status: string) {
   if (status === "queued") return "Sırada / queued"
   if (status === "assigned") return "Değerlendirme altında"
@@ -48,14 +91,18 @@ function StudentReviewsContent() {
     const fetchMine = async () => {
       try {
         setError(null)
-        const res = await fetch("/api/reviews/mine", { method: "GET", cache: "no-store" })
-        if (!res.ok) {
-          const data = await res.json().catch(() => null)
-          if (!cancelled) setError(data?.detail ?? "Durum okunamadı")
-          return
+        let data: StudentReviewsResponse | null = null
+        if (RICH_DEMO) {
+          data = demoStudentReviews()
+        } else {
+          const res = await fetch("/api/reviews/mine", { method: "GET", cache: "no-store" })
+          if (!res.ok) {
+            const errBody = await res.json().catch(() => null)
+            if (!cancelled) setError(errBody?.detail ?? "Durum okunamadı")
+            return
+          }
+          data = (await res.json().catch(() => null)) as StudentReviewsResponse | null
         }
-
-        const data = (await res.json().catch(() => null)) as StudentReviewsResponse | null
         if (!data) return
 
         if (!cancelled) {

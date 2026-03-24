@@ -1,14 +1,59 @@
 "use client"
 
-import type { AuthUser } from "@shared/contracts/auth"
+import type { AuthUser, UserRole } from "@shared/contracts/auth"
 import type { FormEvent } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+const setClientCookie = (name: string, value: string, maxAgeSeconds: number) => {
+  document.cookie = `${name}=${value}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`
+}
+
+const inferDemoRole = (email: string, override: UserRole | ""): UserRole => {
+  if (override) return override
+  const e = email.toLowerCase()
+  if (e.includes("viewer") || e.includes("uzman") || e.includes("expert")) return "viewer"
+  if (
+    e.includes("employer") ||
+    e.includes("galeri") ||
+    e.includes("gallery") ||
+    e.includes("company") ||
+    e.includes("isveren") ||
+    e.includes("işveren") ||
+    e.includes("sirket") ||
+    e.includes("şirket")
+  ) {
+    return "employer"
+  }
+  if (
+    e.includes("student") ||
+    e.includes("ogrenci") ||
+    e.includes("öğrenci") ||
+    e.includes("ada") ||
+    e.includes("yilmaz") ||
+    e.includes("yılmaz")
+  ) {
+    return "student"
+  }
+  return "student"
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [demoRoleOverride, setDemoRoleOverride] = useState<UserRole | "">("")
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("clear_demo") !== "1") return
+    setClientCookie("artbridge_access_token", "", 0)
+    setClientCookie("artbridge_demo_role", "", 0)
+    window.history.replaceState({}, "", "/login")
+  }, [])
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -17,6 +62,23 @@ export default function LoginPage() {
     setError(null)
     setIsSubmitting(true)
     try {
+      if (RICH_DEMO) {
+        const role = inferDemoRole(email, demoRoleOverride)
+        const maxAge = 60 * 60 * 24 * 7
+        setClientCookie("artbridge_access_token", "demo", maxAge)
+        setClientCookie("artbridge_demo_role", role, maxAge)
+
+        const target =
+          role === "student"
+            ? "/student/dashboard"
+            : role === "viewer"
+              ? "/viewer/review"
+              : "/dashboard"
+
+        window.location.replace(target)
+        return
+      }
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,9 +100,8 @@ export default function LoginPage() {
             ? "/viewer/review"
             : "/dashboard"
 
-      // Use hard navigation so Set-Cookie is fully committed before role pages run auth checks.
       window.location.replace(target)
-    } catch (err) {
+    } catch {
       setError("Sunucuya bağlanılamadı")
     } finally {
       setIsSubmitting(false)
@@ -68,6 +129,29 @@ export default function LoginPage() {
             className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-0 focus:border-gray-500 focus:ring-0"
           />
         </div>
+
+        {RICH_DEMO ? (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="demo-role" className="text-sm font-medium text-gray-800">
+              Demo rolü (isteğe bağlı)
+            </label>
+            <select
+              id="demo-role"
+              value={demoRoleOverride}
+              aria-label="Demo rolü"
+              onChange={(e) => setDemoRoleOverride(e.target.value as UserRole | "")}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none ring-0 focus:border-gray-500 focus:ring-0"
+            >
+              <option value="">Otomatik (e-posta ipucundan)</option>
+              <option value="student">Öğrenci (Ada Yılmaz senaryosu)</option>
+              <option value="employer">İşveren / Galeri</option>
+              <option value="viewer">Uzman (Viewer)</option>
+            </select>
+            <p className="text-xs text-gray-500">
+              Canlı demo: backend çağrısı yapılmaz. İstediğin e-posta ve şifre ile giriş yapılabilir.
+            </p>
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-2">
           <label htmlFor="password" className="text-sm font-medium text-gray-800">

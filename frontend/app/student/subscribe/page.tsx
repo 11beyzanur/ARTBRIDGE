@@ -5,6 +5,8 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
 type SubscriptionMe = {
   status: string
   subscription_reference_code?: string | null
@@ -73,6 +75,10 @@ function StudentSubscribeContent() {
       setIsLoadingMe(true)
       setError(null)
       try {
+        if (RICH_DEMO) {
+          if (!cancelled) setMe({ status: "ACTIVE", subscription_reference_code: "DEMO-B2C", order_reference_code: "DEMO-ORD" })
+          return
+        }
         const res = await fetch("/api/subscriptions/me", { method: "GET", cache: "no-store" })
         const data = (await res.json().catch(() => null)) as SubscriptionMe | null
         if (!res.ok || !data) {
@@ -128,6 +134,16 @@ function StudentSubscribeContent() {
     const poll = async () => {
       if (cancelled) return
       try {
+        if (RICH_DEMO) {
+          setMe({ status: "ACTIVE", subscription_reference_code: "DEMO-B2C", order_reference_code: "DEMO-ORD" })
+          if (cancelled) return
+          setToast("Aboneliğin aktif (demo). Yüklemeye devam edebilirsin")
+          if (intervalId) window.clearInterval(intervalId)
+          setTimeout(() => {
+            router.push("/upload")
+          }, 1200)
+          return
+        }
         const res = await fetch("/api/subscriptions/me", { method: "GET", cache: "no-store" })
         const data = (await res.json().catch(() => null)) as SubscriptionMe | null
         if (!res.ok || !data) return
@@ -147,7 +163,6 @@ function StudentSubscribeContent() {
     }
 
     intervalId = window.setInterval(poll, 3000)
-    // initial poll immediately
     poll()
 
     return () => {
@@ -169,6 +184,11 @@ function StudentSubscribeContent() {
     setIsInitializing(true)
 
     try {
+      if (RICH_DEMO) {
+        setMe({ status: "ACTIVE", subscription_reference_code: "DEMO-B2C", order_reference_code: "DEMO-ORD" })
+        setToast("Demo: abonelik anında aktifleştirildi.")
+        return
+      }
       const res = await fetch("/api/subscriptions/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -5,6 +5,8 @@ import type { FormEvent } from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
 export default function RegisterPage() {
   const router = useRouter()
 
@@ -24,6 +26,11 @@ export default function RegisterPage() {
     setSuccess(null)
     setIsSubmitting(true)
     try {
+      if (RICH_DEMO) {
+        setSuccess("Kayıt tamamlandı (demo). Giriş sayfasına yönlendiriliyorsun.")
+        router.push("/login")
+        return
+      }
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

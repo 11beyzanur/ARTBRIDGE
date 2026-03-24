@@ -4,6 +4,63 @@ import type { CareerReadyShareResponse } from "@shared/contracts/career_ready"
 import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+const demoCareerShare = (): CareerReadyShareResponse => ({
+  share_display_name: "Ada Yılmaz",
+  required_reviews: 4,
+  completed_reviews: 4,
+  progress_percent: 88,
+  target_label: "Kariyere Hazırlık Analizi",
+  avg_score: 8.74,
+  items: [
+    {
+      session_id: "demo-cr-1",
+      discipline: "İllüstrasyon",
+      completed_at: "2025-03-28T12:00:00.000Z",
+      public_summary:
+        "Seri bağlantılı üç işte tutarlı bir görsel dil; figür-çevre dengesi güçlü. Profesyonel sunuma yakın.",
+      conceptual_consistency_score: 9.0,
+      technical_adequacy_score: 8.85,
+      originality_score: 8.9,
+      avg_score: 8.92
+    },
+    {
+      session_id: "demo-cr-2",
+      discipline: "Grafik Tasarım",
+      completed_at: "2025-03-15T09:30:00.000Z",
+      public_summary:
+        "Tipografi kararları olgun; grid disiplinine sadık. Marka tonunu bir tık sıcaklaştırması önerildi.",
+      conceptual_consistency_score: 8.75,
+      technical_adequacy_score: 8.9,
+      originality_score: 8.6,
+      avg_score: 8.75
+    },
+    {
+      session_id: "demo-cr-3",
+      discipline: "3D Animasyon",
+      completed_at: "2025-02-22T16:00:00.000Z",
+      public_summary:
+        "Işık-malzeme okuması üst düzey; ritim kurulumları net. Kamera hareketlerinde küçük sadeleştirmeler faydalı.",
+      conceptual_consistency_score: 8.6,
+      technical_adequacy_score: 8.95,
+      originality_score: 8.55,
+      avg_score: 8.7
+    },
+    {
+      session_id: "demo-cr-4",
+      discipline: "Heykel / Mekân",
+      completed_at: "2025-02-01T14:20:00.000Z",
+      public_summary:
+        "Form arayışı cesur; ölçü ve yerleştirme güçlü. Dokusal varyasyonu artırarak derinlik kazanabilir.",
+      conceptual_consistency_score: 8.55,
+      technical_adequacy_score: 8.45,
+      originality_score: 8.8,
+      avg_score: 8.6
+    }
+  ]
+})
+
 function formatDate(dateString: string) {
   const d = new Date(dateString)
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString()
@@ -30,6 +87,10 @@ function CareerReadyShareContent() {
       try {
         setIsLoading(true)
         setError(null)
+        if (RICH_DEMO && (token === "demo-public-career-ready" || token.startsWith("demo-"))) {
+          if (!cancelled) setData(demoCareerShare())
+          return
+        }
         const res = await fetch(`/api/career-ready/share?token=${encodeURIComponent(token)}`, {
           method: "GET",
           cache: "no-store"

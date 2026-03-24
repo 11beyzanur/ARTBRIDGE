@@ -4,6 +4,8 @@ import type { EmployerPackageMeResponse } from "@shared/contracts/employer_packa
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
 type EmployerCustomerForm = {
   name: string
   surname: string
@@ -69,6 +71,14 @@ export default function EmployerPackagesPage() {
   }, [form])
 
   const fetchMe = async () => {
+    if (RICH_DEMO) {
+      setMe({
+        status: "ACTIVE",
+        plan_type: "enterprise",
+        can_access_learning_agility: true
+      })
+      return
+    }
     const res = await fetch("/api/employers/packages/me", { method: "GET", cache: "no-store" })
     const body = await res.json().catch(() => null)
     if (!res.ok || !body) {
@@ -134,6 +144,16 @@ export default function EmployerPackagesPage() {
     setIsInitializing(true)
 
     try {
+      if (RICH_DEMO) {
+        setMe({
+          status: "ACTIVE",
+          plan_type: planType === "enterprise" ? "enterprise" : "standard",
+          can_access_learning_agility: planType === "enterprise"
+        })
+        setError(null)
+        setCheckout(null)
+        return
+      }
       const res = await fetch("/api/employers/packages/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

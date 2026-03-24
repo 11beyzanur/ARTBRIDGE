@@ -4,6 +4,17 @@ import type { ChangeEvent, FormEvent } from "react"
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+const readBrowserCookie = (name: string): string | undefined => {
+  if (typeof document === "undefined") return undefined
+  const parts = document.cookie.split(";").map((p) => p.trim())
+  const prefix = `${name}=`
+  const hit = parts.find((p) => p.startsWith(prefix))
+  if (!hit) return undefined
+  return decodeURIComponent(hit.slice(prefix.length))
+}
+
 const disciplineSuggestions = [
   "Resim",
   "Heykel",
@@ -76,6 +87,20 @@ export default function ViewerReviewPage() {
     setMessage(null)
 
     try {
+      if (RICH_DEMO) {
+        await new Promise((r) => setTimeout(r, 350))
+        setTask({
+          session_id: `demo-sess-${Date.now()}`,
+          portfolio_id: `demo-pf-${Date.now()}`,
+          discipline: disciplineValue,
+          technique: "Dijital üretim · çok katmanlı kompozisyon",
+          asset_url:
+            "https://images.unsplash.com/photo-1541961017774-86549a6e1bdd?auto=format&fit=max&w=1200&q=80",
+          content_type: "image/jpeg"
+        })
+        resetReviewInputs()
+        return
+      }
       const res = await fetch(`/api/reviews/next?discipline=${encodeURIComponent(disciplineValue)}`)
       if (!res.ok) {
         const data = await res.json().catch(() => null)
@@ -119,6 +144,13 @@ export default function ViewerReviewPage() {
         public_summary: publicSummary
       }
 
+      if (RICH_DEMO) {
+        await new Promise((r) => setTimeout(r, 400))
+        setMessage("Değerlendirme gönderildi (demo). Yeni görev için tekrar dene.")
+        setTask(null)
+        return
+      }
+
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,6 +179,22 @@ export default function ViewerReviewPage() {
     let cancelled = false
     const ensureViewerRole = async () => {
       try {
+        if (RICH_DEMO) {
+          const token = readBrowserCookie("artbridge_access_token")
+          const role = readBrowserCookie("artbridge_demo_role")
+          if (token === "demo" && role === "viewer") {
+            if (!cancelled) setIsRoleChecked(true)
+            return
+          }
+          if (token === "demo" && role === "student") {
+            if (!cancelled) router.replace("/student/dashboard")
+            return
+          }
+          if (token === "demo" && role === "employer") {
+            if (!cancelled) router.replace("/dashboard")
+            return
+          }
+        }
         const res = await fetch("/api/auth/me", { method: "GET", cache: "no-store" })
         const data = await res.json().catch(() => null)
         if (!res.ok || !data?.role) {
@@ -229,6 +277,47 @@ export default function ViewerReviewPage() {
         ) : null}
 
         {message ? <div className="mt-3 text-sm text-green-700">{message}</div> : null}
+      </section>
+
+      <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
+        <h3 className="text-sm font-semibold text-gray-900">Piyasa özeti (demo)</h3>
+        <p className="mt-1 text-xs text-gray-600">
+          Disiplin bazlı talep endeksi ve ortalama inceleme ücreti — sunum verisi.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="py-2 pr-3 font-medium text-gray-800">Disiplin</th>
+                <th className="py-2 pr-3 font-medium text-gray-800">Talep endeksi</th>
+                <th className="py-2 pr-3 font-medium text-gray-800">Ort. ücret (TL)</th>
+                <th className="py-2 font-medium text-gray-800">Bekleme süresi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { d: "İllüstrasyon", idx: "Yüksek (94)", fee: "920", wait: "1,8 gün" },
+                { d: "Grafik Tasarım", idx: "Yüksek (91)", fee: "895", wait: "2,1 gün" },
+                { d: "3D Animasyon", idx: "Orta-yüksek (88)", fee: "940", wait: "2,4 gün" },
+                { d: "Endüstriyel Tasarım", idx: "Orta (82)", fee: "860", wait: "2,9 gün" },
+                { d: "Heykel / Mekân", idx: "Niş (76)", fee: "880", wait: "3,2 gün" }
+              ].map((row) => (
+                <tr key={row.d} className="border-b border-gray-100">
+                  <td className="py-2 pr-3 text-gray-800">{row.d}</td>
+                  <td className="py-2 pr-3 text-gray-700">{row.idx}</td>
+                  <td className="py-2 pr-3 text-gray-700">{row.fee}</td>
+                  <td className="py-2 text-gray-700">{row.wait}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <a
+          href="/viewer/finance"
+          className="mt-4 inline-flex text-sm font-medium text-indigo-700 underline"
+        >
+          Kazanç ve ödeme ekranına git
+        </a>
       </section>
 
       {task ? (

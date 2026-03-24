@@ -3,6 +3,123 @@
 import type { EmployerCandidateItem, EmployerDiscoverySearchRequest, EmployerDiscoverySearchResponse } from "@shared/contracts/employer_discovery"
 import { useEffect, useMemo, useState } from "react"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+function buildMockDiscoveryResponse(req: EmployerDiscoverySearchRequest): EmployerDiscoverySearchResponse {
+  const d = req.discipline.trim() || "İllüstrasyon"
+  const trend = (base: number) =>
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => Number((base + i * 0.12 + (i % 3) * 0.04).toFixed(2)))
+
+  const items: EmployerCandidateItem[] = [
+    {
+      student_id: "demo-ada",
+      display_name: "Ada Yılmaz",
+      discipline: d,
+      career_point_avg: 8.95,
+      conceptual_avg: 9.1,
+      technical_avg: 8.75,
+      originality_avg: 9.0,
+      readiness_percent: 91,
+      completed_reviews_total: 7,
+      required_reviews: 4,
+      is_career_ready: true,
+      top_public_summaries: [
+        "Seri anlatımında güçlü ritim; renk kararları profesyonel seviyede. Bir sonraki adımda figür-arka plan hiyerarşisini bir miktar sıkılaştırması önerildi."
+      ],
+      trend_points_12m: trend(7.1),
+      avg_feedback_application_weeks: 1.28
+    },
+    {
+      student_id: "demo-2",
+      display_name: "Demo aday · Kuzey A.",
+      discipline: d,
+      career_point_avg: 8.72,
+      conceptual_avg: 8.5,
+      technical_avg: 8.85,
+      originality_avg: 8.8,
+      readiness_percent: 89,
+      completed_reviews_total: 5,
+      required_reviews: 4,
+      is_career_ready: true,
+      top_public_summaries: [
+        "Teknik derinlik yüksek; kompozisyon tercihleri tutarlı. Özgünlük ekseninde küçük risk alımları önerildi."
+      ],
+      trend_points_12m: trend(6.8),
+      avg_feedback_application_weeks: 1.55
+    },
+    {
+      student_id: "demo-3",
+      display_name: "Demo aday · Selim T.",
+      discipline: d,
+      career_point_avg: 8.6,
+      conceptual_avg: 8.65,
+      technical_avg: 8.45,
+      originality_avg: 8.7,
+      readiness_percent: 87,
+      completed_reviews_total: 6,
+      required_reviews: 4,
+      is_career_ready: true,
+      top_public_summaries: [
+        "Kavramsal çerçeve net; üretim hızı ve iterasyon disiplini güçlü görünüyor."
+      ],
+      trend_points_12m: trend(6.5),
+      avg_feedback_application_weeks: 1.62
+    },
+    {
+      student_id: "demo-4",
+      display_name: "Demo aday · Mira L.",
+      discipline: d,
+      career_point_avg: 8.48,
+      conceptual_avg: 8.4,
+      technical_avg: 8.55,
+      originality_avg: 8.5,
+      readiness_percent: 86,
+      completed_reviews_total: 4,
+      required_reviews: 4,
+      is_career_ready: true,
+      top_public_summaries: [
+        "İyi düzeyde bir portfolyo arşivi; görsel dil birleşik. Daha agresif bir editöryal seçki önerildi."
+      ],
+      trend_points_12m: trend(6.2),
+      avg_feedback_application_weeks: 1.74
+    },
+    {
+      student_id: "demo-5",
+      display_name: "Demo aday · Ege D.",
+      discipline: d,
+      career_point_avg: 8.35,
+      conceptual_avg: 8.2,
+      technical_avg: 8.5,
+      originality_avg: 8.35,
+      readiness_percent: 84,
+      completed_reviews_total: 4,
+      required_reviews: 4,
+      is_career_ready: true,
+      top_public_summaries: [
+        "Form araması kararlı; materyal denemeleri cesur. Sunum dilini sadeleştirmesi faydalı olur."
+      ],
+      trend_points_12m: trend(6.0),
+      avg_feedback_application_weeks: 1.88
+    }
+  ]
+
+  const filtered = req.career_ready_only ? items.filter((x) => x.is_career_ready) : items
+  const scored = filtered.filter(
+    (x) => x.career_point_avg >= req.score_min && x.career_point_avg <= req.score_max
+  )
+  const slice = scored.slice(0, req.limit)
+
+  return {
+    discipline: d,
+    score_min: req.score_min,
+    score_max: req.score_max,
+    career_ready_only: req.career_ready_only,
+    limit: req.limit,
+    items: slice,
+    total_candidates_matched: scored.length
+  }
+}
+
 function formatPercent(value: number) {
   const safe = Number.isFinite(value) ? value : 0
   return `${safe}%`
@@ -47,6 +164,10 @@ export default function EmployerDiscoveryPage() {
 
     const fetchMe = async () => {
       try {
+        if (RICH_DEMO) {
+          if (!cancelled) setCanAccessLearningAgility(true)
+          return
+        }
         const res = await fetch("/api/employers/packages/me", { method: "GET", cache: "no-store" })
         const body = await res.json().catch(() => null)
         if (!res.ok || !body) return
@@ -79,6 +200,10 @@ export default function EmployerDiscoveryPage() {
     setResult(null)
 
     try {
+      if (RICH_DEMO) {
+        setResult(buildMockDiscoveryResponse(requestPayload))
+        return
+      }
       const res = await fetch("/api/employers/discovery/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

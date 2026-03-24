@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
 type EarningItem = {
   id: string
   review_id: string
@@ -28,6 +30,70 @@ type PayoutItem = {
   created_at: string
 }
 
+const demoEarningsSummary = (): EarningsSummary => ({
+  available_try: 8420.75,
+  paid_try: 15680.2,
+  donated_try: 240,
+  total_try: 24340.95,
+  min_payout_try: 500,
+  items: [
+    {
+      id: "demo-earn-1",
+      review_id: "rev-a",
+      amount_try: 920,
+      status: "AVAILABLE",
+      created_at: "2025-03-26T10:00:00.000Z"
+    },
+    {
+      id: "demo-earn-2",
+      review_id: "rev-b",
+      amount_try: 885,
+      status: "AVAILABLE",
+      created_at: "2025-03-24T14:30:00.000Z"
+    },
+    {
+      id: "demo-earn-3",
+      review_id: "rev-c",
+      amount_try: 910,
+      status: "PAID",
+      created_at: "2025-03-18T09:15:00.000Z"
+    },
+    {
+      id: "demo-earn-4",
+      review_id: "rev-d",
+      amount_try: 870,
+      status: "PAID",
+      created_at: "2025-03-10T16:45:00.000Z"
+    },
+    {
+      id: "demo-earn-5",
+      review_id: "rev-e",
+      amount_try: 895,
+      status: "AVAILABLE",
+      created_at: "2025-03-02T11:20:00.000Z"
+    }
+  ]
+})
+
+const demoPayouts = (): PayoutItem[] => [
+  {
+    id: "demo-pay-1",
+    amount_try: 4200,
+    status: "COMPLETED",
+    iban: "TR12 3456 7890 1234 5678 9012 34",
+    note: "Mart dönemi",
+    created_at: "2025-03-05T12:00:00.000Z"
+  },
+  {
+    id: "demo-pay-2",
+    amount_try: 3800,
+    status: "PROCESSING",
+    iban: "TR12 3456 7890 1234 5678 9012 34",
+    note: null,
+    created_at: "2025-02-12T09:30:00.000Z"
+  }
+]
+
 export default function ViewerFinancePage() {
   const [summary, setSummary] = useState<EarningsSummary | null>(null)
   const [payouts, setPayouts] = useState<PayoutItem[]>([])
@@ -44,6 +110,11 @@ export default function ViewerFinancePage() {
   }, [iban, summary])
 
   const fetchAll = async () => {
+    if (RICH_DEMO) {
+      setSummary(demoEarningsSummary())
+      setPayouts(demoPayouts())
+      return
+    }
     const [earningsRes, payoutsRes] = await Promise.all([
       fetch("/api/viewer/earnings", { method: "GET", cache: "no-store" }),
       fetch("/api/viewer/payouts", { method: "GET", cache: "no-store" }),
@@ -84,6 +155,33 @@ export default function ViewerFinancePage() {
     setRequesting(true)
     setError(null)
     try {
+      if (RICH_DEMO) {
+        const amount = summary?.available_try ?? 0
+        setPayouts((prev) => [
+          {
+            id: `demo-pay-${Date.now()}`,
+            amount_try: amount,
+            status: "REQUESTED",
+            iban: iban.trim(),
+            note: note.trim() || null,
+            created_at: new Date().toISOString()
+          },
+          ...prev
+        ])
+        setSummary((s) =>
+          s
+            ? {
+                ...s,
+                available_try: 0,
+                paid_try: s.paid_try + amount,
+                items: s.items.map((it) =>
+                  it.status === "AVAILABLE" ? { ...it, status: "PAID" } : it
+                )
+              }
+            : s
+        )
+        return
+      }
       const res = await fetch("/api/viewer/payouts/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

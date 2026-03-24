@@ -3,6 +3,104 @@
 import type { LearningAgilityDisciplineBreakdown, LearningAgilityMineResponse } from "@shared/contracts/learning_agility"
 import { useEffect, useMemo, useState } from "react"
 
+const RICH_DEMO = process.env.NEXT_PUBLIC_ARTBRIDGE_RICH_DEMO !== "false"
+
+const demoLearningAgilityMine = (): LearningAgilityMineResponse => ({
+  target_days: 14,
+  overall_avg_days_to_apply: 10.18,
+  overall_avg_agility_score: 87.42,
+  transitions_count: 9,
+  disciplines: [
+    {
+      discipline: "İllüstrasyon",
+      avg_days_to_apply: 9.65,
+      avg_agility_score: 88.6,
+      transitions: [
+        {
+          from_session_id: "demo-ill-1",
+          to_session_id: "demo-ill-2",
+          completed_at: "2025-02-02T11:20:00.000Z",
+          next_request_created_at: "2025-02-11T16:45:00.000Z",
+          days_to_apply: 9.22,
+          agility_score: 89.1,
+          conceptual_avg: 9.0,
+          technical_avg: 8.8,
+          originality_avg: 8.9
+        },
+        {
+          from_session_id: "demo-ill-2",
+          to_session_id: "demo-ill-3",
+          completed_at: "2025-02-28T09:00:00.000Z",
+          next_request_created_at: "2025-03-09T10:30:00.000Z",
+          days_to_apply: 9.06,
+          agility_score: 89.5,
+          conceptual_avg: 9.1,
+          technical_avg: 8.85,
+          originality_avg: 8.95
+        },
+        {
+          from_session_id: "demo-ill-3",
+          to_session_id: "demo-ill-4",
+          completed_at: "2025-03-22T14:00:00.000Z",
+          next_request_created_at: "2025-03-31T08:00:00.000Z",
+          days_to_apply: 8.75,
+          agility_score: 90.2,
+          conceptual_avg: 9.05,
+          technical_avg: 8.95,
+          originality_avg: 9.0
+        }
+      ]
+    },
+    {
+      discipline: "Grafik Tasarım",
+      avg_days_to_apply: 10.72,
+      avg_agility_score: 86.15,
+      transitions: [
+        {
+          from_session_id: "demo-gra-1",
+          to_session_id: "demo-gra-2",
+          completed_at: "2025-01-18T12:00:00.000Z",
+          next_request_created_at: "2025-01-29T09:15:00.000Z",
+          days_to_apply: 10.88,
+          agility_score: 85.9,
+          conceptual_avg: 8.6,
+          technical_avg: 8.55,
+          originality_avg: 8.5
+        },
+        {
+          from_session_id: "demo-gra-2",
+          to_session_id: "demo-gra-3",
+          completed_at: "2025-03-05T13:30:00.000Z",
+          next_request_created_at: "2025-03-16T11:00:00.000Z",
+          days_to_apply: 10.56,
+          agility_score: 86.4,
+          conceptual_avg: 8.65,
+          technical_avg: 8.6,
+          originality_avg: 8.55
+        }
+      ]
+    },
+    {
+      discipline: "3D Animasyon",
+      avg_days_to_apply: 11.05,
+      avg_agility_score: 84.9,
+      transitions: [
+        {
+          from_session_id: "demo-3d-1",
+          to_session_id: "demo-3d-2",
+          completed_at: "2025-02-10T10:00:00.000Z",
+          next_request_created_at: "2025-02-22T15:20:00.000Z",
+          days_to_apply: 12.22,
+          agility_score: 82.7,
+          conceptual_avg: 8.4,
+          technical_avg: 8.7,
+          originality_avg: 8.35
+        }
+      ]
+    }
+  ]
+})
+
 function formatNumber(value: number | null | undefined) {
   if (value === null || value === undefined) return "—"
   return value.toFixed(2)
@@ -91,6 +189,10 @@ export default function LearningAgilityPage() {
       try {
         setIsLoading(true)
         setError(null)
+        if (RICH_DEMO) {
+          if (!cancelled) setData(demoLearningAgilityMine())
+          return
+        }
         const res = await fetch("/api/learning-agility/mine", { method: "GET", cache: "no-store" })
         const body = await res.json().catch(() => null)
         if (!res.ok || !body) {
